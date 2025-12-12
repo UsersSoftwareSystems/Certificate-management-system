@@ -28,7 +28,7 @@ class CertificateGeneratedNotification extends Notification implements ShouldQue
 
         return (new MailMessage)
             ->subject('Your Certificate is Ready')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->greeting('Hello ' . $this->certificate->applicant->name . ',')
             ->line('Your certificate has been generated successfully.')
             ->line('Serial Number: ' . $this->certificate->serial_number)
             ->action('View Certificate', $url)

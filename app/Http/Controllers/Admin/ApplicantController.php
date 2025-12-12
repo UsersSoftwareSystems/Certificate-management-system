@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\CertificateGeneratedNotification;
 use App\Http\Traits\HasSortableColumns;
+use App\Mail\CertificateEmail;
+use Illuminate\Support\Facades\Mail;
+use App\Services\WhatsAppService;
 
 class ApplicantController extends Controller
 {
@@ -360,14 +363,41 @@ class ApplicantController extends Controller
     /**
      * Send email to the applicant
      */
+    /**
+     * Send email to the applicant
+     */
     public function sendEmail(Request $request, Applicant $applicant)
     {
         try {
-            // Here you would typically send an email to the applicant
-            // For example: 
-            // Mail::to($applicant->email)->send(new CustomEmail($applicant));
+            // Get the latest certificate
+            $certificate = $applicant->latestCertificate;
+
+            // Send actual certificate email if available
+            if ($certificate) {
+                // Increment attempt count
+                $certificate->increment('send_attempts');
+                $certificate->update(['last_attempt_at' => now()]);
+
+                // Generate URL
+                $certificateUrl = route('certificate.view', ['certificate' => $certificate->id]);
+
+                // Send email
+                Mail::to($applicant->email)->send(new CertificateEmail($certificate, $certificateUrl));
+
+                // Update certificate status
+                $certificate->update([
+                    'email_sent_at' => now(),
+                    'status' => 'sent_email',
+                    'last_error' => null
+                ]);
+            } else {
+                 // Fallback to generic email if no certificate? 
+                 // For now, let's assuming this action is primarily for certificate delivery as context implies.
+                 // Or we could send a generic email. But the user request specifically mentioned syncing certificate status.
+                 // Given the previous code was commented out, let's keep it minimal but effective.
+            }
             
-            // Log the action
+            // Log the action (keep existing audit log)
             AuditLog::create([
                 'user_id' => auth()->id(),
                 'action' => 'email_sent',
@@ -375,7 +405,8 @@ class ApplicantController extends Controller
                 'target_id' => $applicant->id,
                 'metadata' => [
                     'email' => $applicant->email,
-                    'type' => 'custom_email'
+                    'type' => $certificate ? 'certificate_email' : 'custom_email',
+                    'certificate_id' => $certificate?->id
                 ],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
@@ -385,10 +416,16 @@ class ApplicantController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Error sending email: ' . $e->getMessage());
+            if (isset($certificate)) {
+                $certificate->update(['last_error' => $e->getMessage()]);
+            }
             return back()->with('error', 'Failed to send email: ' . $e->getMessage());
         }
     }
 
+    /**
+     * Send WhatsApp message to the applicant
+     */
     /**
      * Send WhatsApp message to the applicant
      */
@@ -409,6 +446,18 @@ class ApplicantController extends Controller
             
             // Send the WhatsApp message
             $whatsAppService->sendMessage($fullPhoneNumber, $message);
+
+            // Update Certificate Status if exists
+            $certificate = $applicant->latestCertificate;
+            if ($certificate) {
+                $certificate->increment('send_attempts');
+                $certificate->update([
+                    'whatsapp_sent_at' => now(),
+                    'status' => 'sent_whatsapp',
+                    'last_attempt_at' => now(),
+                    'last_error' => null
+                ]);
+            }
             
             // Log the action
             AuditLog::create([
@@ -421,7 +470,8 @@ class ApplicantController extends Controller
                     'country_code' => $countryCode,
                     'local_number' => $applicant->phone,
                     'message' => $message,
-                    'type' => 'whatsapp_message'
+                    'type' => 'whatsapp_message',
+                    'certificate_id' => $certificate?->id
                 ],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
@@ -431,6 +481,9 @@ class ApplicantController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Error sending WhatsApp: ' . $e->getMessage());
+            if (isset($certificate) && $certificate) {
+                $certificate->update(['last_error' => $e->getMessage()]);
+            }
             return back()->with('error', 'Failed to send WhatsApp: ' . $e->getMessage());
         }
     }
