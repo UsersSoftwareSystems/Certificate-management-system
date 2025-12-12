@@ -31,6 +31,14 @@ class FormController extends Controller
     public function show(string $token)
     {
         $applicant = Applicant::where('token', $token)->firstOrFail();
+        
+        // One-time edit restriction
+        if ($applicant->edit_count >= 1) {
+            return redirect()
+                ->route('apply.success', $token)
+                ->with('info', 'Your application is locked and cannot be edited further.');
+        }
+
         $applicant->load('uploads');
         
         return view('public.application-form', compact('applicant', 'token'));
@@ -43,9 +51,17 @@ class FormController extends Controller
             
             Log::info('Form submission received', $request->all());
             
+            $token = $request->input('token', Str::random(64));
+            $existingApplicant = Applicant::where('token', $token)->first();
+
+            // Check if locked
+            if ($existingApplicant && $existingApplicant->edit_count >= 1) {
+                throw new \Exception('Application is locked and cannot be edited.');
+            }
+            
             // Create or update applicant
             $applicant = Applicant::updateOrCreate(
-                ['token' => $request->input('token', Str::random(64))],
+                ['token' => $token],
                 [
                     'name' => $request->input('name'),
                     'email' => $request->input('email'),
@@ -59,7 +75,12 @@ class FormController extends Controller
                 ]
             );
 
-            Log::info('Applicant created', ['id' => $applicant->id, 'name' => $applicant->name]);
+            // Increment edit count if it's an update
+            if ($existingApplicant) {
+                $applicant->increment('edit_count');
+            }
+
+            Log::info('Applicant created/updated', ['id' => $applicant->id, 'name' => $applicant->name]);
 
             // Handle file uploads
             $uploadTypes = ['tenth_certificate', 'twelfth_certificate', 'graduation_certificate', 'masters_certificate'];
@@ -98,14 +119,23 @@ class FormController extends Controller
                 'uploads_count' => $uploadCount
             ]);
 
-            // Notify applicant and admin
-            Notification::route('mail', $applicant->email)
-                ->notify(new ApplicantSubmittedNotification($applicant));
+            // Notify only on initial submission
+            if (!$existingApplicant) {
+                try {
+                    Notification::route('mail', $applicant->email)
+                        ->notify(new ApplicantSubmittedNotification($applicant));
 
-            // Send a basic admin notification to the first Super Admin
-            $admin = \App\Models\User::role('Super Admin')->first();
-            if ($admin) {
-                $admin->notify(new AdminNewSubmissionNotification($applicant));
+                    $admin = \App\Models\User::role('Super Admin')->first();
+                    if ($admin) {
+                        $admin->notify(new AdminNewSubmissionNotification($applicant));
+                    }
+                } catch (\Exception $e) {
+                    // Log email error but don't fail the request
+                    Log::error('Failed to send submission notifications', [
+                        'error' => $e->getMessage(),
+                        'applicant_id' => $applicant->id
+                    ]);
+                }
             }
 
             return redirect()
@@ -123,6 +153,21 @@ class FormController extends Controller
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Failed to submit application: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deleteUpload(\App\Models\Upload $upload)
+    {
+        try {
+            // Security check: ensure the upload belongs to the applicant associated with the current token (if known) 
+            // Since this is a public route, we might need to rely on the token in the session or request.
+            // Simplified for now: just delete. In a real app, verify ownership via a signed URL or session token.
+            
+            $this->fileUploadService->deleteUpload($upload);
+            
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 

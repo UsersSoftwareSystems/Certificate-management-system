@@ -32,6 +32,7 @@ Route::prefix('apply')->name('apply.')->middleware('throttle:30,1')->group(funct
     Route::get('/', [App\Http\Controllers\Public\FormController::class, 'create'])->name('create');
     Route::get('/{token}', [App\Http\Controllers\Public\FormController::class, 'show'])->name('show');
     Route::post('/', [App\Http\Controllers\Public\FormController::class, 'store'])->middleware('throttle:5,1')->name('store');
+    Route::delete('/upload/{upload}', [App\Http\Controllers\Public\FormController::class, 'deleteUpload'])->name('upload.delete');
     Route::get('/{token}/success', [App\Http\Controllers\Public\FormController::class, 'success'])->name('success');
 });
 
