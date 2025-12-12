@@ -65,10 +65,12 @@
 
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            @if($applicant->edit_count < 1)
             <a href="{{ route('apply.show', $applicant->token) }}" 
                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl transition duration-150">
                 View/Edit Application
             </a>
+            @endif
             <a href="{{ route('apply.create') }}" 
                class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 font-medium py-3 px-6 rounded-xl transition duration-150">
                 Submit New Application

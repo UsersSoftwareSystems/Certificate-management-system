@@ -216,7 +216,7 @@
                 @endphp
 
                 @foreach($uploadTypes as $key => $label)
-                <div x-data="fileUpload('{{ $key }}')" class="space-y-3">
+                <div x-data="fileUpload('{{ $key }}', {{ isset($applicant) && $applicant->uploads ? json_encode($applicant->uploads->where('type', str_replace('_certificate', '', $key))->map(function($u) { return ['id' => $u->id, 'name' => $u->original_filename]; })->values()) : '[]' }})" class="space-y-3">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ $label }}</label>
                     <div @dragover.prevent @drop.prevent="handleDrop($event)" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all" :class="{ 'border-blue-400': isDragging }">
                         <div class="text-center">
@@ -227,17 +227,36 @@
                                 <input type="file" name="{{ $key }}[]" @change="handleFileSelect($event)" multiple accept=".pdf,.jpg,.jpeg,.png" class="hidden" id="{{ $key }}">
                                 <label for="{{ $key }}" class="cursor-pointer text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline">Upload files</label>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">or drag and drop</p>
-                            </div>
                         </div>
                     </div>
+                    </div>
+                    
+                    <!-- Existing Files -->
+                    <div x-show="existingFiles.length > 0" class="space-y-2">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Existing:</p>
+                        <template x-for="(file, index) in existingFiles" :key="'existing-' + file.id">
+                            <div class="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.414l5.586 5.586a1 1 0 01.414 1.414V19a2 2 0 01-2 2z"></path></svg>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300" x-text="file.name"></span>
+                                </div>
+                                <button type="button" @click.prevent="removeExistingFile(index)" class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z"></path></svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- New Files -->
                     <div x-show="files.length > 0" class="space-y-2">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">New:</p>
                         <template x-for="(file, index) in files" :key="index">
                             <div class="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <div class="flex items-center space-x-2">
                                     <img :src="file.preview" class="w-8 h-8 rounded-md object-cover">
                                     <span class="text-sm text-gray-700 dark:text-gray-300" x-text="file.name"></span>
                                 </div>
-                                <button @click.prevent="removeFile(index)" class="text-red-500 hover:text-red-700">
+                                <button type="button" @click.prevent="removeFile(index)" class="text-red-500 hover:text-red-700">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 01-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z"></path></svg>
                                 </button>
                             </div>
@@ -295,10 +314,17 @@ function applicationForm() {
     }
 }
 
-function fileUpload(name) {
+
+function fileUpload(name, existingFiles = []) {
     return {
         files: [],
+        existingFiles: existingFiles,
         isDragging: false,
+        
+        init() {
+            // No need to init files, existingFiles are separate
+        },
+
         handleFileSelect(event) {
             this.addFiles(event.target.files);
         },
@@ -306,15 +332,43 @@ function fileUpload(name) {
             this.isDragging = false;
             this.addFiles(event.dataTransfer.files);
         },
-        addFiles(files) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+        addFiles(fileList) {
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (file.size > 5242880) {
+                    alert('File ' + file.name + ' exceeds 5MB limit.');
+                    continue;
+                }
                 file.preview = URL.createObjectURL(file);
                 this.files.push(file);
             }
         },
         removeFile(index) {
             this.files.splice(index, 1);
+        },
+        async removeExistingFile(index) {
+            const file = this.existingFiles[index];
+            if (!confirm('Are you sure you want to delete this file?')) return;
+
+            try {
+                const response = await fetch(`/apply/upload/${file.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    this.existingFiles.splice(index, 1);
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Failed to delete file.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the file.');
+            }
         }
     }
 }

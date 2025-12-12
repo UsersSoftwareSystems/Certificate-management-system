@@ -6,18 +6,18 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- KPI Cards - FORCED HORIZONTAL LAYOUT USING FLEXBOX -->
-    <div class="flex flex-col sm:flex-row gap-4 lg:gap-6">
+    <!-- KPI Cards - DYNAMIC FLEX WRAP LAYOUT -->
+    <div class="flex flex-wrap gap-4 lg:gap-6">
         <!-- Total Applications -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-            <div class="flex items-center justify-between">
+        <div class="flex-1 min-w-[200px] xl:min-w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-sm font-medium card-text-secondary">Total Applications</p>
-                    <p class="text-2xl lg:text-3xl font-bold card-text-primary mt-2">{{ number_format($stats['total_applications']) }}</p>
-                    <p class="text-green-600 dark:text-green-400 text-sm font-medium mt-1">+12% vs last month</p>
+                    <p class="text-xs font-medium card-text-secondary h-9">Total Applications</p>
+                    <p class="text-2xl font-bold card-text-primary mt-1">{{ number_format($stats['total_applications']) }}</p>
+                    <p class="text-green-600 dark:text-green-400 text-xs font-medium mt-1">+12% vs last month</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
@@ -25,15 +25,15 @@
         </div>
 
         <!-- Pending Applications -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-            <div class="flex items-center justify-between">
+        <div class="flex-1 min-w-[200px] xl:min-w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-sm font-medium card-text-secondary">Pending Review</p>
-                    <p class="text-2xl lg:text-3xl font-bold card-text-primary mt-2">{{ number_format($stats['pending_applications']) }}</p>
-                    <p class="text-yellow-600 dark:text-yellow-400 text-sm font-medium mt-1">{{ $stats['pending_applications'] > 0 ? 'Needs attention' : 'All clear' }}</p>
+                    <p class="text-xs font-medium card-text-secondary h-9">Pending Review</p>
+                    <p class="text-2xl font-bold card-text-primary mt-1">{{ number_format($stats['pending_applications']) }}</p>
+                    <p class="text-yellow-600 dark:text-yellow-400 text-xs font-medium mt-1">{{ $stats['pending_applications'] > 0 ? 'Needs attention' : 'All clear' }}</p>
                 </div>
-                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/60 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/60 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-yellow-500 dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
@@ -41,16 +41,16 @@
         </div>
 
         <!-- Verified Applications -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-            <div class="flex items-center justify-between">
+        <div class="flex-1 min-w-[200px] xl:min-w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-sm font-medium card-text-secondary">Verified</p>
-                    <p class="text-2xl lg:text-3xl font-bold card-text-primary mt-2">{{ number_format($stats['verified_applications']) }}</p>
+                    <p class="text-xs font-medium card-text-secondary h-9">Verified</p>
+                    <p class="text-2xl font-bold card-text-primary mt-1">{{ number_format($stats['verified_applications']) }}</p>
                     @php $rate = $stats['total_applications'] ? round(($stats['verified_applications'] / $stats['total_applications']) * 100, 1) : 0; @endphp
-                    <p class="text-green-600 dark:text-green-400 text-sm font-medium mt-1">{{ $rate }}% completion</p>
+                    <p class="text-green-600 dark:text-green-400 text-xs font-medium mt-1">{{ $rate }}% completion</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                 </div>
@@ -58,16 +58,16 @@
         </div>
 
         <!-- Documents -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-            <div class="flex items-center justify-between">
+        <div class="flex-1 min-w-[200px] xl:min-w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-sm font-medium card-text-secondary">Documents</p>
-                    <p class="text-2xl lg:text-3xl font-bold card-text-primary mt-2">{{ number_format($stats['total_uploads']) }}</p>
+                    <p class="text-xs font-medium card-text-secondary h-9">Documents</p>
+                    <p class="text-2xl font-bold card-text-primary mt-1">{{ number_format($stats['total_uploads']) }}</p>
                     @php $avg = $stats['total_applications'] ? round($stats['total_uploads'] / $stats['total_applications'], 1) : 0; @endphp
-                    <p class="text-purple-600 dark:text-purple-400 text-sm font-medium mt-1">{{ $avg }} avg per app</p>
+                    <p class="text-purple-600 dark:text-purple-400 text-xs font-medium mt-1">{{ $avg }} avg per app</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
                 </div>
@@ -75,20 +75,20 @@
         </div>
 
         <!-- Certificates Generated -->
-        <div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 lg:p-6">
-            <div class="flex items-center justify-between">
+        <div class="flex-1 min-w-[200px] xl:min-w-[250px] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-sm font-medium card-text-secondary">Certificates Generated</p>
-                    <p class="text-2xl lg:text-3xl font-bold card-text-primary mt-2">{{ number_format($stats['certificates_generated']) }}</p>
+                    <p class="text-xs font-medium card-text-secondary h-9">Certificates Generated</p>
+                    <p class="text-2xl font-bold card-text-primary mt-1">{{ number_format($stats['certificates_generated']) }}</p>
                     @php
                         $avgCertificates = $stats['total_applications'] > 0 
                             ? round($stats['certificates_generated'] / $stats['total_applications'], 1)
                             : 0;
                     @endphp
-                    <p class="text-indigo-600 dark:text-indigo-400 text-sm font-medium mt-1">{{ $avgCertificates }} per application</p>
+                    <p class="text-indigo-600 dark:text-indigo-400 text-xs font-medium mt-1">{{ $avgCertificates }} per application</p>
                 </div>
-                <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
                 </div>
