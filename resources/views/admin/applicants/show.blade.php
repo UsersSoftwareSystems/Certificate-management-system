@@ -21,48 +21,165 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Personal Information -->
-        <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h3>
-            <dl class="space-y-2">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
-                    <dd class="text-sm text-gray-900 dark:text-white">{{ $applicant->email }}</dd>
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Personal Information
+            </h3>
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Email</dt>
+                    <dd class="text-base text-gray-900 dark:text-white font-medium break-all">{{ $applicant->email }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
-                    <dd class="text-sm text-gray-900 dark:text-white">{{ $applicant->phone }}</dd>
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Phone</dt>
+                    <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->phone }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</dt>
-                    <dd class="text-sm text-gray-900 dark:text-white">{{ ucfirst($applicant->gender) }}</dd>
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Gender</dt>
+                    <dd class="text-base text-gray-900 dark:text-white font-medium">{{ ucfirst($applicant->gender) }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</dt>
-                    <dd class="text-sm text-gray-900 dark:text-white">{{ $applicant->date_of_birth ? $applicant->date_of_birth->format('M d, Y') : 'Not provided' }}</dd>
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Date of Birth</dt>
+                    <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->date_of_birth ? $applicant->date_of_birth->format('M d, Y') : 'Not provided' }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
-                    <dd class="text-sm">
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Current Status</dt>
+                    <dd class="mt-1">
                         @if($applicant->status === 'pending')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-400">
-                                Pending
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
+                                <svg class="w-2 h-2 mr-1.5 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
+                                Pending Review
                             </span>
                         @elseif($applicant->status === 'verified')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                                <svg class="w-2 h-2 mr-1.5 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
                                 Verified
                             </span>
                         @elseif($applicant->status === 'rejected')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
+                                <svg class="w-2 h-2 mr-1.5 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
                                 Rejected
                             </span>
+                        @elseif($applicant->status === 'rejected')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                <svg class="w-2 h-2 mr-1.5 fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
+                                Rejected
+                            </span>
+                        @else
+                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                {{ ucfirst($applicant->status) }} 
+                             </span>
                         @endif
                     </dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted</dt>
-                    <dd class="text-sm text-gray-900 dark:text-white">{{ $applicant->submitted_at ? $applicant->submitted_at->format('M d, Y g:i A') : 'Not submitted' }}</dd>
+                <div class="mb-6 md:mb-0">
+                    <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Submitted On</dt>
+                    <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->submitted_at ? $applicant->submitted_at->format('M d, Y g:i A') : 'Not submitted' }}</dd>
                 </div>
             </dl>
+        </div>
+
+            <!-- Trustee Association Information -->
+            <div class="border-t border-gray-100 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800/50">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                         <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Temple Association
+                    </h3>
+                     <!-- Trustee Status Badge -->
+                    @php
+                        $trusteeStatusColors = [
+                            'pending' => 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+                            'requested' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+                            'approved' => 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
+                            'rejected' => 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+                        ];
+                    @endphp
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm text-gray-500 dark:text-gray-400">Trustee Verification:</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide {{ $trusteeStatusColors[$applicant->trustee_status] ?? 'bg-gray-100 text-gray-800' }}">
+                            {{ ucfirst($applicant->trustee_status) }}
+                        </span>
+                    </div>
+                </div>
+                
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+                    <div class="md:col-span-2 mb-6 md:mb-0">
+                        <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Address of Jain Temple</dt>
+                        <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->temple_address }}</dd>
+                    </div>
+                    <div class="mb-6 md:mb-0">
+                        <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Name of Trustee</dt>
+                        <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->trustee_name }}</dd>
+                    </div>
+                    <div class="mb-6 md:mb-0">
+                        <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Trustee Designation</dt>
+                        <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->trustee_designation }}</dd>
+                    </div>
+                    <div class="mb-6 md:mb-0">
+                        <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Trustee Mobile</dt>
+                        <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->trustee_mobile ?: 'Not provided' }}</dd>
+                    </div>
+                    <div class="mb-6 md:mb-0">
+                        <dt class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Trustee Email</dt>
+                        <dd class="text-base text-gray-900 dark:text-white font-medium">{{ $applicant->trustee_email }}</dd>
+                    </div>
+                </dl>
+
+                <!-- Trustee Verification Actions Card -->
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">Verification Status</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            @if($applicant->trustee_status === 'pending')
+                                Verification email has not been sent yet.
+                            @elseif($applicant->trustee_status === 'requested')
+                                Email sent. Waiting for trustee response.
+                            @elseif($applicant->trustee_status === 'approved')
+                                Trustee has approved this application.
+                            @elseif($applicant->trustee_status === 'rejected')
+                                Trustee has rejected this application.
+                            @endif
+                        </p>
+                         @if($applicant->trustee_responded_at)
+                             <p class="text-xs text-gray-400 mt-1">
+                                Last response: {{ $applicant->trustee_responded_at->format('M d, Y h:i A') }}
+                            </p>
+                        @endif
+                    </div>
+                    
+                    @if($applicant->trustee_status !== 'approved' && $applicant->trustee_status !== 'rejected')
+                        <form action="{{ route('admin.applicants.send-trustee-verification', $applicant->id) }}" method="POST" class="flex-shrink-0">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm dark:focus:ring-offset-gray-900">
+                                <svg class="h-4 w-4 mr-2 text-blue-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                {{ $applicant->trustee_status === 'requested' ? 'Resend Email' : 'Send Verification Email' }}
+                            </button>
+                        </form>
+                    @elseif($applicant->trustee_status === 'approved')
+                        <div class="flex items-center text-green-600 dark:text-green-400 font-medium text-sm">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Verified
+                        </div>
+                    @elseif($applicant->trustee_status === 'rejected')
+                         <div class="flex items-center text-red-600 dark:text-red-400 font-medium text-sm">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Rejected
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <!-- Uploaded Documents -->
@@ -151,15 +268,29 @@
         <div class="flex flex-wrap justify-between items-center w-full gap-4">
             @if($applicant->status === 'pending')
             <div class="flex items-center space-x-4">
-                <form action="{{ route('admin.applicants.start-verification', $applicant) }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                        </svg>
-                        Start Verification
-                    </button>
-                </form>
+                @if($applicant->trustee_status === 'approved')
+                    <form action="{{ route('admin.applicants.start-verification', $applicant) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                            Start Verification
+                        </button>
+                    </form>
+                @else
+                    <div class="group relative inline-block">
+                        <button type="button" disabled class="inline-flex items-center px-4 py-2 border border-blue-200 text-sm font-medium rounded-md shadow-sm text-blue-300 bg-blue-50 cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                            Start Verification
+                        </button>
+                        <div class="hidden group-hover:block absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap shadow-lg">
+                            Trustee approval required first
+                        </div>
+                    </div>
+                @endif
             @endif
 
             @if($applicant->status === 'in_verification')

@@ -191,6 +191,115 @@
             </div>
         </div>
 
+        <!-- Temple Association Information Section -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8">
+            <div class="flex items-center space-x-3 mb-6">
+                <!-- Using Indigo and explicit style to ensure visibility -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-600" style="background-color: #4f46e5;">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Temple Association Information</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Temple Address -->
+                <div class="md:col-span-2 space-y-2">
+                    <label for="temple_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Address of Jain Temple (Associated With) <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="temple_address" name="temple_address" rows="2"
+                              class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 resize-none dark:text-gray-100"
+                              placeholder="Enter the address of the Jain Temple you are associated with" required>{{ old('temple_address', isset($applicant) ? $applicant->temple_address : '') }}</textarea>
+                    @error('temple_address')
+                        <p class="text-red-500 text-sm">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Trustee Name -->
+                <div class="space-y-2">
+                    <label for="trustee_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Name of Trustee <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="trustee_name" name="trustee_name" 
+                           value="{{ old('trustee_name', isset($applicant) ? $applicant->trustee_name : '') }}"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 dark:text-gray-100"
+                           placeholder="Trustee Name" required>
+                    @error('trustee_name')
+                        <p class="text-red-500 text-sm">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Trustee Designation -->
+                <div class="space-y-2">
+                    <label for="trustee_designation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Trustee Designation <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="trustee_designation" name="trustee_designation" 
+                           value="{{ old('trustee_designation', isset($applicant) ? $applicant->trustee_designation : '') }}"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 dark:text-gray-100"
+                           placeholder="e.g. Secretary, President" required>
+                    @error('trustee_designation')
+                        <p class="text-red-500 text-sm">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Trustee Mobile -->
+                <div class="space-y-2">
+                    <label for="trustee_mobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Trustee Mobile Number <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex space-x-2">
+                        <!-- Country Code Dropdown -->
+                        <div class="w-1/3">
+                            <select name="trustee_country_code" id="trustee_country_code"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 dark:text-gray-100" required>
+                                <option value="" disabled selected>Code</option>
+                                <option value="+1" {{ old('trustee_country_code', '+91') === '+1' ? 'selected' : '' }}>+1 (US/CA)</option>
+                                <option value="+44" {{ old('trustee_country_code', '+91') === '+44' ? 'selected' : '' }}>+44 (UK)</option>
+                                <option value="+61" {{ old('trustee_country_code', '+91') === '+61' ? 'selected' : '' }}>+61 (AU)</option>
+                                <option value="+91" {{ old('trustee_country_code', '+91') === '+91' ? 'selected' : '' }}>+91 (IN)</option>
+                                <option value="+971" {{ old('trustee_country_code', '+91') === '+971' ? 'selected' : '' }}>+971 (UAE)</option>
+                            </select>
+                            @error('trustee_country_code')
+                                <p class="text-red-500 text-sm">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <!-- Mobile Number Input -->
+                        <div class="flex-1">
+                            <input type="tel" id="trustee_mobile" name="trustee_mobile" 
+                                value="{{ old('trustee_mobile', isset($applicant) ? $applicant->trustee_mobile : '') }}"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 dark:text-gray-100"
+                                placeholder="Trustee Mobile Number"
+                                pattern="[0-9]{10}"
+                                title="Please enter a valid 10-digit phone number"
+                                inputmode="numeric"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+                                required>
+                            @error('trustee_mobile')
+                                <p class="text-red-500 text-sm">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trustee Email -->
+                <div class="space-y-2">
+                    <label for="trustee_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Trustee Email <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="trustee_email" name="trustee_email" 
+                           value="{{ old('trustee_email', isset($applicant) ? $applicant->trustee_email : '') }}"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/50 dark:bg-gray-700/50 dark:text-gray-100"
+                           placeholder="trustee@example.com" required>
+                    @error('trustee_email')
+                        <p class="text-red-500 text-sm">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </div>
+
         <!-- Document Upload Section -->
         <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8">
             <div class="flex items-center space-x-3 mb-6">
@@ -212,6 +321,8 @@
                         'twelfth_certificate' => '12th Certificate',
                         'graduation_certificate' => 'Graduation Certificate',
                         'masters_certificate' => 'Master\'s Certificate',
+                        'sports_certificate' => 'Sports Achievement Certificate',
+                        'extraordinary_certificate' => 'Extraordinary Achievement / Other',
                     ];
                 @endphp
 

@@ -25,10 +25,20 @@ class ApplicationFormRequest extends FormRequest
             'twelfth_certificate.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'graduation_certificate.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'masters_certificate.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'sports_certificate.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'extraordinary_certificate.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'tenth_certificate' => ['nullable', 'array'],
             'twelfth_certificate' => ['nullable', 'array'],
             'graduation_certificate' => ['nullable', 'array'],
-            'masters_certificate' => ['nullable', 'array']
+            'masters_certificate' => ['nullable', 'array'],
+            'sports_certificate' => ['nullable', 'array'],
+            'extraordinary_certificate' => ['nullable', 'array'],
+            'temple_address' => ['required', 'string', 'max:1000'],
+            'trustee_name' => ['required', 'string', 'max:255'],
+            'trustee_country_code' => ['required', 'string', 'max:5'],
+            'trustee_mobile' => ['required', 'string', 'max:20'],
+            'trustee_email' => ['required', 'email', 'max:255'],
+            'trustee_designation' => ['required', 'string', 'max:255'],
         ];
     }
 
