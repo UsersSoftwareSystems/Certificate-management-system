@@ -34,6 +34,14 @@ class Applicant extends Model
         'rejected_at',
         'rejected_by',
         'rejection_reason',
+        'temple_address',
+        'trustee_name',
+        'trustee_country_code',
+        'trustee_mobile',
+        'trustee_email',
+        'trustee_designation',
+        'trustee_status',
+        'trustee_responded_at',
     ];
 
     protected $casts = [
@@ -43,6 +51,7 @@ class Applicant extends Model
         'verification_started_at' => 'datetime',
         'verification_completed_at' => 'datetime',
         'rejected_at' => 'datetime',
+        'trustee_responded_at' => 'datetime',
     ];
 
     protected static function boot()

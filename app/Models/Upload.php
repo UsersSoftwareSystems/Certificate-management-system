@@ -173,6 +173,8 @@ class Upload extends Model
             'twelfth' => '12th Certificate', 
             'graduation' => 'Graduation Certificate',
             'masters' => 'Master\'s Certificate',
+            'sports' => 'Sports Achievement Certificate',
+            'extraordinary' => 'Extraordinary Achievement / Other',
             default => 'Unknown'
         };
     }

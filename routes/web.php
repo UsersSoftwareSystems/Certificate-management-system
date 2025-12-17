@@ -30,10 +30,14 @@ Route::get('/certificate/{certificate}', [App\Http\Controllers\Admin\Certificate
 // Public Application Routes (basic throttling)
 Route::prefix('apply')->name('apply.')->middleware('throttle:30,1')->group(function () {
     Route::get('/', [App\Http\Controllers\Public\FormController::class, 'create'])->name('create');
-    Route::get('/{token}', [App\Http\Controllers\Public\FormController::class, 'show'])->name('show');
-    Route::post('/', [App\Http\Controllers\Public\FormController::class, 'store'])->middleware('throttle:5,1')->name('store');
-    Route::delete('/upload/{upload}', [App\Http\Controllers\Public\FormController::class, 'deleteUpload'])->name('upload.delete');
-    Route::get('/{token}/success', [App\Http\Controllers\Public\FormController::class, 'success'])->name('success');
+    Route::post('/', [App\Http\Controllers\Public\FormController::class, 'store'])->middleware('throttle:60,1')->name('store');
+    Route::get('/success/{token}', [App\Http\Controllers\Public\FormController::class, 'success'])->name('success');
+    Route::get('/application/{token}', [App\Http\Controllers\Public\FormController::class, 'show'])->name('show');
+    Route::post('/application/{upload}/delete', [App\Http\Controllers\Public\FormController::class, 'deleteUpload'])->name('upload.delete');
+
+    // Trustee Verification Routes
+    Route::get('/verify-trustee/{token}', [App\Http\Controllers\Public\TrusteeVerificationController::class, 'show'])->name('trustee.verify.show');
+    Route::post('/verify-trustee/{token}', [App\Http\Controllers\Public\TrusteeVerificationController::class, 'update'])->name('trustee.verify.update');
 });
 
 require __DIR__.'/auth.php';
@@ -87,6 +91,7 @@ Route::middleware(['auth','role:Super Admin|Verifier|Certificate Issuer'])->pref
     Route::post('/applicants/{applicant}/complete-verification', [\App\Http\Controllers\Admin\ApplicantController::class, 'completeVerification'])->name('applicants.complete-verification');
     Route::post('/applicants/{applicant}/reject', [\App\Http\Controllers\Admin\ApplicantController::class, 'reject'])->name('applicants.reject');
     Route::post('/applicants/{applicant}/generate-certificate', [\App\Http\Controllers\Admin\ApplicantController::class, 'generateCertificate'])->name('applicants.generate-certificate');
+    Route::post('/applicants/{applicant}/send-trustee-verification', [\App\Http\Controllers\Admin\ApplicantController::class, 'sendTrusteeVerification'])->name('applicants.send-trustee-verification');
     // Soft delete/restore Applicants
     Route::delete('/applicants/{applicant}', [\App\Http\Controllers\Admin\ApplicantController::class, 'destroy'])->name('applicants.destroy');
     Route::post('/applicants/{id}/restore', [\App\Http\Controllers\Admin\ApplicantController::class, 'restore'])->name('applicants.restore');

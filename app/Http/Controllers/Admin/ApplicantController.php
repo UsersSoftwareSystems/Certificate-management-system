@@ -17,6 +17,7 @@ use App\Http\Traits\HasSortableColumns;
 use App\Mail\CertificateEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Services\WhatsAppService;
+use App\Jobs\GenerateCertificate;
 
 class ApplicantController extends Controller
 {
@@ -95,20 +96,42 @@ class ApplicantController extends Controller
             'email' => ['required','email','max:255'],
             'country_code' => ['required','string','max:5'],
             'phone' => ['required','string','regex:/^[0-9]{10}$/'],
-            'status' => ['required','in:pending,in_verification,verified,rejected,certificate_generated']
+            'status' => ['required','in:pending,in_verification,verified,rejected,certificate_generated'],
+            'rejection_reason' => ['nullable', 'string', 'max:1000'],
+            'verification_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
         // Store the old status for comparison
         $oldStatus = $applicant->status;
         $newStatus = $request->input('status');
 
-        // Delete certificates if status is being changed to pending
-        if ($oldStatus !== 'pending' && $newStatus === 'pending' && $applicant->certificates()->exists()) {
+        // Delete certificates if status is being changed to pending OR rejected
+        if (($newStatus === 'pending' || $newStatus === 'rejected') && $applicant->certificates()->exists()) {
             $applicant->certificates()->delete();
         }
 
         // Update the applicant
-        $applicant->update($validated);
+        $applicant->fill($validated);
+        
+        // Handle specific status fields
+        if ($newStatus === 'rejected') {
+            $applicant->rejection_reason = $request->input('rejection_reason');
+            $applicant->rejected_at = now();
+            $applicant->rejected_by = auth()->id();
+        } elseif ($newStatus === 'verified') {
+            $applicant->verification_notes = $request->input('verification_notes');
+            // Only update completed_at if it wasn't already verified (optional, but good for tracking re-verification)
+             if ($oldStatus !== 'verified') {
+                $applicant->verification_completed_at = now();
+                $applicant->verification_completed_by = auth()->id();
+            }
+        } elseif ($newStatus === 'pending') {
+             // Reset verification/rejection info if moved back to pending? 
+             // User just asked for certificate deletion. Let's keep it simple but safe.
+             // Usually moving to pending might imply resetting these, but let's just leave them as history unless explicitly cleared.
+        }
+
+        $applicant->save();
 
         // Update all uploads to match the application status
         if ($request->has('status')) {
@@ -156,6 +179,11 @@ class ApplicantController extends Controller
         // Check if application is in pending state
         if ($applicant->status !== 'pending') {
             return back()->with('error', 'Verification can only be started for pending applications.');
+        }
+
+        // Check if trustee has approved
+        if ($applicant->trustee_status !== 'approved') {
+            return back()->with('error', 'Trustee must approve the application before verification can start.');
         }
 
         // Start verification process
@@ -223,6 +251,11 @@ class ApplicantController extends Controller
         ]);
 
         Log::info('Starting rejection for applicant: ' . $applicant->id);
+
+        // Delete certificates if they exist
+        if ($applicant->certificates()->exists()) {
+            $applicant->certificates()->delete();
+        }
 
         // Update applicant status
         $applicant->update([
@@ -295,7 +328,33 @@ class ApplicantController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
-    public function generateCertificate(Request $request, Applicant $applicant, CertificateService $certificateService)
+    public function sendTrusteeVerification(Applicant $applicant)
+    {
+        // Prevent sending if already approved or verified
+        if ($applicant->trustee_status === 'approved') {
+             return redirect()->back()->with('error', 'Trustee has already approved this application.');
+        }
+
+        try {
+            // Generate link
+            $url = route('apply.trustee.verify.show', $applicant->token);
+            
+            // Send Mail
+            \Illuminate\Support\Facades\Mail::to($applicant->trustee_email)
+                ->send(new \App\Mail\TrusteeVerificationMail($applicant, $url));
+                
+            $applicant->update([
+                'trustee_status' => 'requested'
+            ]);
+            
+            return redirect()->back()->with('success', 'Verification request sent to Trustee successfully.');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send trustee verification', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
+    public function generateCertificate(Request $request, Applicant $applicant)
     {
         // Check if application is verified
         if ($applicant->status !== 'verified') {
@@ -307,56 +366,26 @@ class ApplicantController extends Controller
             'template_id' => 'required|exists:certificate_templates,id'
         ]);
 
-        // Start a database transaction
-        \DB::beginTransaction();
-
         try {
-            // Find the selected certificate template
             $template = CertificateTemplate::findOrFail($request->template_id);
 
-            // Generate the certificate
-            $certificate = $certificateService->generateCertificate($applicant, $template, auth()->id());
-
-            // Update verification details
-            $applicant->update([
-                'verification_completed_at' => now(),
-                'verification_completed_by' => auth()->id()
-            ]);
-
-            // Create audit log
-            AuditLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'certificate_generated',
-                'target_type' => get_class($certificate),
-                'target_id' => $certificate->id,
-                'metadata' => [
-                    'applicant_id' => $applicant->id,
-                    'serial_number' => $certificate->serial_number,
-                    'template_name' => $template->name
-                ],
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
-
-            // Queue email notification
-            Notification::route('mail', $applicant->email)
-                ->notify(new CertificateGeneratedNotification($certificate));
-
-            // Commit the transaction
-            \DB::commit();
+            // Dispatch job to generate certificate in background
+            GenerateCertificate::dispatch(
+                $applicant,
+                $template,
+                auth()->id(),
+                $request->ip(),
+                $request->userAgent()
+            )->afterResponse();
 
             return redirect()->route('admin.applicants.index')
-                ->with('success', 'Certificate generated successfully for ' . $applicant->name);
+                ->with('success', 'Certificate generation started for ' . $applicant->name . '. It will be available shortly.');
 
         } catch (\Exception $e) {
-            // Rollback the transaction on error
-            \DB::rollBack();
-            
-            Log::error('Error generating certificate: ' . $e->getMessage());
-            Log::error($e->getTraceAsString());
+            Log::error('Error dispatching certificate generation job: ' . $e->getMessage());
             
             return redirect()->route('admin.applicants.show', $applicant)
-                ->with('error', 'Failed to generate certificate: ' . $e->getMessage());
+                ->with('error', 'Failed to start certificate generation: ' . $e->getMessage());
         }
     }
 

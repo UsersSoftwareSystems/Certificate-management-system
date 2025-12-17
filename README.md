@@ -1,61 +1,151 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Certificate Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust, secure, and user-friendly web application for managing applicant certificates, trustee verifications, and administrative workflows. Built with modern web technologies to ensure scalability and ease of use.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Public Application Portal**: accessible form for applicants to submit details and upload certificates.
+-   **Trustee Verification Workflow**: Automated email workflows for trustees to verify applicant claims securely.
+-   **Admin Dashboard**: comprehensive panel to view, approve, rejection, and manage applications.
+-   **Certificate Generation**: Automated PDF generation for verified applicants.
+-   **Role-Based Access Control**: Secure admin and user permissions using Spatie Permissions.
+-   **Dark Mode Support**: Fully responsive UI with native dark mode integration.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Technical Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   **Backend**: Laravel 12.x (PHP 8.2+)
+-   **Frontend**: Blade Templates, Alpine.js, TailwindCSS 4.0
+-   **Database**: SQLite (Default), compatible with MySQL/PostgreSQL
+-   **Build Tool**: Vite
+-   **Containerization**: Docker & Docker Compose
+-   **Queue & Cache**: Redis
+-   **PDF Generation**: DomPDF
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 💻 Installation Guide
 
-## Laravel Sponsors
+Follow these steps to set up the project on a new machine.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prerequisites
 
-### Premium Partners
+Ensure you have the following installed:
+-   [PHP 8.2+](https://www.php.net/downloads)
+-   [Composer](https://getcomposer.org/)
+-   [Node.js & NPM](https://nodejs.org/)
+-   [Git](https://git-scm.com/)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Method 1: Local Setup (Recommended for Development)
 
-## Contributing
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/yourusername/certificate-management-system.git
+    cd certificate-management-system
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2.  **Install PHP Dependencies**
+    ```bash
+    composer install
+    ```
 
-## Code of Conduct
+3.  **Install Frontend Dependencies**
+    ```bash
+    npm install
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4.  **Environment Configuration**
+    Copy the example environment file and configure it:
+    ```bash
+    cp .env.example .env
+    ```
+    *Update the `.env` file with your database or mail configuration if needed. By default, it is configured for SQLite.*
 
-## Security Vulnerabilities
+5.  **Generate Application Key**
+    ```bash
+    php artisan key:generate
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6.  **Database Setup**
+    Create the SQLite database file and run migrations:
+    ```bash
+    touch database/database.sqlite
+    php artisan migrate --seed
+    ```
+    *The `--seed` flag populates the database with initial roles and admin users.*
 
-## License
+7.  **Start the Server**
+    You need to run two commands in separate terminal windows:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    *Terminal 1 (Vite Build server):*
+    ```bash
+    npm run dev
+    ```
+
+    *Terminal 2 (Laravel Server):*
+    ```bash
+    php artisan serve
+    ```
+
+    Access the application at: `http://localhost:8000`
+
+---
+
+### Method 2: Docker Setup (Production/Isolated Env)
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/yourusername/certificate-management-system.git
+    cd certificate-management-system
+    ```
+
+2.  **Environment Configuration**
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  **Build and Start Containers**
+    ```bash
+    docker-compose up -d --build
+    ```
+
+4.  **Install Dependencies inside Container**
+    ```bash
+    docker-compose exec app composer install
+    docker-compose exec app php artisan key:generate
+    docker-compose exec app php artisan migrate --seed
+    ```
+
+5.  **Access Application**
+    -   **Web App**: `http://localhost:8080`
+    -   **MailCatcher** (Email Testing): `http://localhost:1080`
+
+---
+
+## 🔑 Default Credentials
+
+If the database seeder was run, use the following credentials to log in as an Admin:
+
+-   **Email**: `admin@restaurant.com`
+-   **Password**: `password`
+
+---
+
+## 🧪 Running Tests
+
+To run the automated test suite:
+
+```bash
+php artisan test
+```
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

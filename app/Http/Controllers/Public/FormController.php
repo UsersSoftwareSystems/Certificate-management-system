@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ApplicantSubmittedNotification;
 use App\Notifications\AdminNewSubmissionNotification;
+use App\Jobs\ProcessApplicationSubmission;
 
 class FormController extends Controller
 {
@@ -70,6 +71,12 @@ class FormController extends Controller
                     'gender' => $request->input('gender'),
                     'date_of_birth' => $request->input('date_of_birth'),
                     'educational_details' => $request->input('educational_details'),
+                    'temple_address' => $request->input('temple_address'),
+                    'trustee_name' => $request->input('trustee_name'),
+                    'trustee_country_code' => $request->input('trustee_country_code', '+91'),
+                    'trustee_mobile' => $request->input('trustee_mobile'),
+                    'trustee_email' => $request->input('trustee_email'),
+                    'trustee_designation' => $request->input('trustee_designation'),
                     'status' => 'pending',
                     'submitted_at' => now(),
                 ]
@@ -83,7 +90,7 @@ class FormController extends Controller
             Log::info('Applicant created/updated', ['id' => $applicant->id, 'name' => $applicant->name]);
 
             // Handle file uploads
-            $uploadTypes = ['tenth_certificate', 'twelfth_certificate', 'graduation_certificate', 'masters_certificate'];
+            $uploadTypes = ['tenth_certificate', 'twelfth_certificate', 'graduation_certificate', 'masters_certificate', 'sports_certificate', 'extraordinary_certificate'];
             $uploadCount = 0;
 
             foreach ($uploadTypes as $uploadType) {
@@ -119,24 +126,8 @@ class FormController extends Controller
                 'uploads_count' => $uploadCount
             ]);
 
-            // Notify only on initial submission
-            if (!$existingApplicant) {
-                try {
-                    Notification::route('mail', $applicant->email)
-                        ->notify(new ApplicantSubmittedNotification($applicant));
-
-                    $admin = \App\Models\User::role('Super Admin')->first();
-                    if ($admin) {
-                        $admin->notify(new AdminNewSubmissionNotification($applicant));
-                    }
-                } catch (\Exception $e) {
-                    // Log email error but don't fail the request
-                    Log::error('Failed to send submission notifications', [
-                        'error' => $e->getMessage(),
-                        'applicant_id' => $applicant->id
-                    ]);
-                }
-            }
+            // Notify in background after response is sent
+            ProcessApplicationSubmission::dispatch($applicant, !$existingApplicant)->afterResponse();
 
             return redirect()
                 ->route('apply.success', $applicant->token)
