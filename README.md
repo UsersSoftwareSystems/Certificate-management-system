@@ -133,8 +133,8 @@ Ensure you have the following installed:
 
 If the database seeder was run, use the following credentials to log in as an Admin:
 
--   **Email**: `admin@restaurant.com`
--   **Password**: `password`
+-   **Email**: `admin@certificate-system.com`
+-   **Password**: `admin123`
 
 ---
 
